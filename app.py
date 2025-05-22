@@ -32,22 +32,22 @@ def index():
 def predict():
     try:
         form_data = request.form
-        print("Raw form data:", form_data)
+        print("💡 Raw form data:", form_data)
 
-        # Convert form keys to match model expectations
         input_data = {key_map[k]: float(v) for k, v in form_data.items()}
-        print("Formatted input for model:", input_data)
+        print("🔧 Formatted input for model:", input_data)
 
-        # Model expects values in a specific order
         features = [input_data[k] for k in key_map.values()]
+        print("🚀 Feature list for prediction:", features)
+
         prediction = model.predict([features])
-        quality = round(prediction[0], 2)
+        quality = round(float(prediction[0]), 2)
+        print("🍷 Predicted quality:", quality)
 
-        return render_template('result.html', prediction=quality)
-
+        return render_template('index.html', prediction=f'Predicted wine quality: {quality}')
+    
     except Exception as e:
-        print("Prediction error:", str(e))
-        traceback.print_exc()
+        print("🔥 Prediction error:", str(e))
         return render_template('index.html', prediction="Something went wrong. Please check your input. And your life choices.")
 
 if __name__ == '__main__':
