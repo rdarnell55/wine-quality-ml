@@ -1,6 +1,6 @@
-flask
-scikit-learn
-joblib
-numpy
-ucimlrepo
-gunicorn
+flask==3.1.1
+scikit-learn==1.6.1
+joblib==1.5.0
+numpy==2.2.6
+ucimlrepo==0.0.7
+gunicorn==23.0.0
