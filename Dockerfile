@@ -10,8 +10,8 @@ COPY . .
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose the port Flask is running on
+# Expose 5000 (optional, for local Docker testing)
 EXPOSE 5000
 
-# Set the entry point for the container
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
+# Use shell form so Heroku’s $PORT is picked up at runtime
+CMD gunicorn --bind 0.0.0.0:$PORT app:app
