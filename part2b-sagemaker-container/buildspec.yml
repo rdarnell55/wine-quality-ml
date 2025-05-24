@@ -2,24 +2,24 @@ version: 0.2
 
 env:
   variables:
-    AWS_ACCOUNT_ID: "998072949015"
     AWS_DEFAULT_REGION: "us-east-2"
+    AWS_ACCOUNT_ID: "998072949015"
     IMAGE_REPO_NAME: "wine-quality-container"
 
 phases:
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR..."
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION \
-        | docker login --username AWS --password-stdin \
-          $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      # combine into one line so CodeBuild doesn't choke on backslashes
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login \
+          --username AWS \
+          --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
 
   build:
     commands:
       - echo "Building Docker image…"
       - cd part2b-sagemaker-container
-      - docker build --platform linux/amd64 \
-          -t $IMAGE_REPO_NAME:latest .
+      - docker build --platform linux/amd64 -t $IMAGE_REPO_NAME:latest .
       - docker tag $IMAGE_REPO_NAME:latest \
           $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
 
@@ -29,4 +29,5 @@ phases:
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
 
 artifacts:
-  files: []
+  files:
+    - '**/*'
