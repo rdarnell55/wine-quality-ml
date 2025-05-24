@@ -7,25 +7,30 @@ env:
 phases:
   pre_build:
     commands:
-      - echo Logging in to Amazon ECR...
-      # pull the account ID dynamically
+      - echo "==> Logging in to Amazon ECR..."
+      # Grab your AWS account ID dynamically
       - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-      - echo "Account is $ACCOUNT_ID, region is $AWS_DEFAULT_REGION"
-      # now do a one-liner login (no backslashes!)
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION \
-        | docker login --username AWS --password-stdin \
-          $ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
-      # set the full ECR URI for later
+      - echo "Account: $ACCOUNT_ID | Region: $AWS_DEFAULT_REGION"
+      # Log in to ECR (no interactive TTY)
+      - aws ecr get-login-password \
+          --region $AWS_DEFAULT_REGION \
+        | docker login \
+          --username AWS \
+          --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      # Define the full repository URI
       - REPOSITORY_URI=$ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_NAME
 
   build:
     commands:
-      - echo Building the Docker image...
-      - docker build --platform linux/amd64 -t $IMAGE_NAME .
+      - echo "==> Building Docker image..."
+      - docker build \
+          --platform linux/amd64 \
+          -t $IMAGE_NAME .
+      - echo "==> Tagging image for ECR…"
       - docker tag $IMAGE_NAME:latest $REPOSITORY_URI:latest
 
   post_build:
     commands:
-      - echo Pushing the Docker image...
+      - echo "==> Pushing to ECR…"
       - docker push $REPOSITORY_URI:latest
-      - echo Build completed on `date`
+      - echo "==> Build completed on $(date)"
