@@ -2,35 +2,30 @@ version: 0.2
 
 env:
   variables:
-    IMAGE_NAME: wine-quality-container
+    AWS_ACCOUNT_ID: "998072949015"
+    AWS_DEFAULT_REGION: "us-east-2"
+    IMAGE_REPO_NAME: "wine-quality-container"
 
 phases:
   pre_build:
     commands:
-      - echo "==> Logging in to Amazon ECR..."
-      # Grab your AWS account ID dynamically
-      - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-      - echo "Account: $ACCOUNT_ID | Region: $AWS_DEFAULT_REGION"
-      # Log in to ECR (no interactive TTY)
-      - aws ecr get-login-password \
-          --region $AWS_DEFAULT_REGION \
-        | docker login \
-          --username AWS \
-          --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
-      # Define the full repository URI
-      - REPOSITORY_URI=$ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_NAME
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION \
+        | docker login --username AWS --password-stdin \
+            $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
 
   build:
     commands:
-      - echo "==> Building Docker image..."
-      - docker build \
-          --platform linux/amd64 \
-          -t $IMAGE_NAME .
-      - echo "==> Tagging image for ECR…"
-      - docker tag $IMAGE_NAME:latest $REPOSITORY_URI:latest
+      - echo Building the Docker image
+      - cd part2b-sagemaker-container
+      - docker build --platform linux/amd64 -t $IMAGE_REPO_NAME:latest .
+      - docker tag $IMAGE_REPO_NAME:latest \
+          $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
 
   post_build:
     commands:
-      - echo "==> Pushing to ECR…"
-      - docker push $REPOSITORY_URI:latest
-      - echo "==> Build completed on $(date)"
+      - echo Pushing the Docker image to ECR
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
+
+artifacts:
+  files: []
