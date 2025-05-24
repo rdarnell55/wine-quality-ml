@@ -10,16 +10,13 @@ phases:
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR..."
-      - aws ecr get-login-password \
-        --region $AWS_DEFAULT_REGION | \
-        docker login \
-          --username AWS \
-          --password-stdin \
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION \
+        | docker login --username AWS --password-stdin \
           $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
 
   build:
     commands:
-      - echo "Building Docker image…"
+      - echo "Building Docker imageâ€¦"
       - cd part2b-sagemaker-container
       - docker build --platform linux/amd64 \
           -t $IMAGE_REPO_NAME:latest .
@@ -28,9 +25,8 @@ phases:
 
   post_build:
     commands:
-      - echo "Pushing image to ECR…"
+      - echo "Pushing image to ECRâ€¦"
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
 
 artifacts:
   files: []
-
