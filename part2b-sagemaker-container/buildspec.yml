@@ -1,0 +1,12 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 998072949015.dkr.ecr.us-east-2.amazonaws.com
+      - export DOCKER_BUILDKIT=0
+  build:
+    commands:
+      - docker build --platform linux/amd64 -t wine-quality-container:latest .
+      - docker tag wine-quality-container:latest 998072949015.dkr.ecr.us-east-2.amazonaws.com/wine-quality-container:latest
+      - docker push 998072949015.dkr.ecr.us-east-2.amazonaws.com/wine-quality-container:latest
