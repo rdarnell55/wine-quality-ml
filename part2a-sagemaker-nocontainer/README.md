@@ -1,35 +1,45 @@
-# Part 2a - Wine Quality Prediction (SageMaker without Containers)
+# Part 2a: AWS SageMaker (No Container)
 
-## Description
+This part of the project demonstrates how to train and deploy a machine learning model using AWS SageMaker **without custom containerization**. The model is trained locally and then deployed using SageMaker's built-in hosting capabilities.
 
-This project trains a linear regression model to predict wine quality scores using AWS SageMaker *without* custom containers.
+## Overview
 
-Used:
-- Scikit-learn for model training
-- SageMaker Studio Lab or SageMaker Notebook
-- Native SageMaker functionality to deploy a model endpoint
+- **Model Used:** Linear Regression (`sklearn.linear_model.LinearRegression`)
+- **Framework:** Scikit-learn
+- **Deployment Method:** SageMaker SDK, no container customization
+- **Repository Folder:** [`part2a-sagemaker-nocontainer`](https://github.com/rdarnell55/wine-quality-ml/tree/main/part2a-sagemaker-nocontainer)
 
----
 
-## Files
+## Model Description
 
-- `wine_quality_notebook.ipynb` – Notebook that loads the dataset, trains the model, saves the `.pkl`, and optionally creates a `.tar.gz`.
-- `wine_quality_model.pkl` – Trained model file
-- `model.tar.gz` – (Optional) tar-gzipped model file for S3 upload
-- `sample_prediction.py` – (Optional) simple script to query the deployed endpoint
+The model used is a **Linear Regression** model trained to predict wine quality scores based on physicochemical features from the UCI Wine Quality dataset. The model is serialized using `joblib` and uploaded to SageMaker, where it is deployed as a REST API endpoint.
 
----
+## Endpoint Information
 
-## Deployment Info
+- **SageMaker Endpoint Name:** `wine-quality-endpoint-1748042764`
+- **Model Artifact:** `wine_quality_model.pkl`
+- **Deployment Script:** `wine_deploy_sagemaker_sdk.ipynb`
 
-If you deployed a SageMaker endpoint, include:
-
-- **Endpoint Name**: `wine-quality-endpoint-<timestamp>`
-- **Test Output**: Predicted wine quality for `[11.2, 0.28, 0.56, 1.9, 0.075, 17.0, 60.0, 0.998, 3.16, 0.58, 9.8]` was `5.1`
+The endpoint accepts POST requests with input data in JSON format and returns the predicted wine quality.
 
 ---
 
-## Notes
+## Project Structure
 
-- No containers or custom images were used.
-- Deployed using built-in SageMaker sklearn image.
+| File | Description |
+|------|-------------|
+| `train_wine_model.ipynb` | Notebook used to preprocess the dataset and train the linear regression model |
+| `wine_quality_model.pkl` | Serialized model file saved using `joblib` |
+| `model.tar.gz` | Tarball containing the model for SageMaker deployment |
+| `predictor.py` | Python module to send requests to the SageMaker endpoint |
+| `wine_deploy_sagemaker_sdk.ipynb` | Notebook that creates and tests the deployed model on SageMaker |
+| `README.md` | This documentation file |
+
+---
+
+## The Endpoint is tested inline and shown in: `wine_deploy_sagemaker_sdk.ipynb` 
+
+## Repository
+
+- **Main project repository:** [https://github.com/rdarnell55/wine-quality-ml](https://github.com/rdarnell55/wine-quality-ml)
+- **Part 2a repository folder:** [`part2a-sagemaker-nocontainer`](https://github.com/rdarnell55/wine-quality-ml/tree/main/part2a-sagemaker-nocontainer)
